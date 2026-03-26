@@ -6,4 +6,4 @@
 - Modal con trailer de YouTube y descripción.  
 - Favoritos guardados en localStorage.  
 
-🔗 [Ver online](https://movie-explorer.vercel.app)
+🔗 [Ver online](https://movie-explorer-rust-omega.vercel.app)
