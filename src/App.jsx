@@ -179,7 +179,7 @@
           </button>
         )}
 
-        <h1 style={{ color: "#1e560b" }}>🎬 Movie Explorer</h1>
+        <h1 style={{ color: "#1e560b" }}>🎬 Movie Exporer</h1>
         <input 
           type="text"
           placeholder="Buscar película..."
