@@ -16,7 +16,7 @@ const transformMovie = (movie) => ({
   img: movie.poster_path 
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` 
     : "https://via.placeholder.com/150x225/000000/FFFFFF?text=No+Image",
-  rating: movie.vote_average || 0,
+  rating: Number(movie.vote_average) || 0,
   name: movie.name,
   type: movie.media_type || (movie.title ? "movie" : "tv")
 });
@@ -38,7 +38,7 @@ const MovieCard = ({ movie }) => {
           <img src={movie.img} alt={movie.title} className="movie-img" />
           <div className="movie-info">
             <h3 className="movie-title">{movie.title}</h3>
-            <p className="movie-year">{movie.year} • {movie.rating.toFixed(1)} ⭐</p>
+            <p className="movie-year">{movie.year} • {typeof movie.rating === 'number' ? movie.rating.toFixed(1) : "0.0"} ⭐</p>
           </div>
         </div>
       </Link>
@@ -63,7 +63,7 @@ function App() {
     return () => clearTimeout(timeout);
   }, [searchQuery]);
 
-  // 2. Lógica de Búsqueda corregida
+  // 2. Corrected Search Logic
   useEffect(() => {
     if (!debouncedQuery.trim()) {
       setMovies([]);

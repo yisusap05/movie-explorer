@@ -68,7 +68,7 @@ function MoviePage() {
       
       <div style={{ display: "flex", gap: "15px", marginBottom: "20px", alignItems: "center" }}>
         <span style={{ color: "gold", fontWeight: "bold" }}> 
-          ⭐ { movie.vote_average ? movie.vote_average?.toFixed(1) : "N/A" }
+          ⭐ { (movie && typeof movie.vote_average === 'number') ? movie.vote_average.toFixed(1) : "N/A" }
         </span>
         <span style={{ color: "#ccc", fontSize: "0.9rem" }}>
           {movie.release_date?.split("-")[0] || movie.first_air_date?.split("-")[0] || ""}
