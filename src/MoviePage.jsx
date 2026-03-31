@@ -58,8 +58,6 @@ function MoviePage() {
   };
 
   const finalVideoUrl = selectedServer === "trailer" ? trailerUrl : servers[selectedServer];
-  
-  // Corregido el nombre de la variable para que coincida con el IF de abajo
   const isDirectVideo = selectedServer === "direct_link"; 
 
   return (

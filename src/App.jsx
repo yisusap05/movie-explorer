@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
 import { Link } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
 import { useFavorites } from "./FavoritesContext";
 
-// Usamos la API KEY de las variables de entorno
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 const transformMovie = (movie) => ({
@@ -22,7 +22,6 @@ const transformMovie = (movie) => ({
 });
 
 const MovieCard = ({ movie }) => {
-  // CORRECCIÓN: 'tittle' estaba mal escrito en tu archivo. Es 'title'.
   const path = movie.type === "tv" ? `/tv/${movie.id}` : `/movie/${movie.id}`;
 
   return (
@@ -56,7 +55,7 @@ function App() {
   const [topRated, setTopRated] = useState([]);
   const [nowPlaying, setNowPlaying] = useState([]);
   
-  const { favorites, isFavorite, setFavorites } = useFavorites();
+  const { favorites } = useFavorites();
 
   // 1. Debounce para la búsqueda
   useEffect(() => {
@@ -66,28 +65,41 @@ function App() {
 
   // 2. Lógica de Búsqueda corregida
   useEffect(() => {
-    if (!debouncedQuery) {
+    if (!debouncedQuery.trim()) {
       setMovies([]);
       return;
     }
 
-    setLoading(true);
-    fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${debouncedQuery}&language=en-US`)
-      .then(res => res.json())
-      .then(data => {
-        const filtered = data.results
+    const controller = new AbortController();
+
+    const fetchMovies = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(debouncedQuery)}&language=en-US`,
+          { signal: controller.signal }
+        );
+        const data = await res.json();
+        
+        const filtered = (data.results || [])
           .filter(item => (item.media_type === 'movie' || item.media_type === 'tv') && item.poster_path)
           .map(transformMovie);
+        
         setMovies(filtered);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error("Search error:", err);
+        }
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error("Search error:", err);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchMovies();
+
+    return () => controller.abort();
   }, [debouncedQuery]);
 
-  // 3. Cargar Categorías iniciales
   useEffect(() => {
     const fetchCategory = async (url, setter) => {
       try {
@@ -108,9 +120,9 @@ function App() {
     <div style={{ marginBottom: "30px" }}>
       <h2 style={{ marginLeft: "10px" }}>{title}</h2>
       <div className="movie-row" style={{ display: "flex", overflowX: "auto", padding: "10px", gap: "15px" }}>
-        <AnimatePresence>
+        <AnimatePresence mode="popLayout">
           {data.map(m => (
-            <MovieCard key={m.id} movie={m} />
+            <MovieCard key={`${title}-${m.id}`} movie={m} />
           ))}
         </AnimatePresence>
       </div>
@@ -123,21 +135,21 @@ function App() {
       
       <input 
         type="text"
-        placeholder="Buscar película o serie..."
+        placeholder="Search for a movie or series..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         className="search-input"
         style={{ padding: "12px", borderRadius: "8px", width: "100%", maxWidth: "500px", marginBottom: "30px", border: "1px solid #333", background: "#111", color: "#fff" }}
       />
 
-      {debouncedQuery ? (
-        loading ? <p>Buscando...</p> : renderRow("Resultados de búsqueda", movies)
+      {debouncedQuery.trim() ? (
+        loading ? <p>Searching...</p> : renderRow("Search results", movies)
       ) : (
         <>
-          {favorites.length > 0 && renderRow("Mis Favoritos", favorites)}
-          {renderRow("Tendencias", trending)}
-          {renderRow("Mejor Valoradas", topRated)}
-          {renderRow("En Cines", nowPlaying)}
+          {favorites.length > 0 && renderRow("My Favorites", favorites)}
+          {renderRow("Trending", trending)}
+          {renderRow("Top Rated", topRated)}
+          {renderRow("Now Playing", nowPlaying)}
         </>
       )}
     </div>
