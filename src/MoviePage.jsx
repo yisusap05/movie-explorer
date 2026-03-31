@@ -69,8 +69,12 @@ function MoviePage() {
       <h1 style={{ color: "#fff", margin: "20px 0 30px 0" }}>{movie.title || movie.name}</h1>
       
       <div style={{ display: "flex", gap: "15px", marginBottom: "20px", alignItems: "center" }}>
-        <span style={{ color: "gold", fontWeight: "bold" }}> ⭐ {movie.vote_average?.toFixed(1)}</span>
-        <span style={{ color: "#ccc", fontSize: "0.9rem" }}>{movie.release_date?.split("-")[0] || movie.first_air_date?.split("-")[0]}</span>
+        <span style={{ color: "gold", fontWeight: "bold" }}> 
+          ⭐ { movie.vote_average ? movie.vote_average?.toFixed(1) : "N/A" }
+        </span>
+        <span style={{ color: "#ccc", fontSize: "0.9rem" }}>
+          {movie.release_date?.split("-")[0] || movie.first_air_date?.split("-")[0] || ""}
+        </span>
         <span style={{ color: "#aaa", fontSize: "0.8rem", border: "1px solid #444", padding: "2px 6px", borderRadius: "4px" }}>
           {movie.adult ? "18+" : "PG-13"}
         </span>
